@@ -5,7 +5,9 @@ Write a data type to represent a set of points in the unit square (all points ha
 Full Specification of this assignment : 
 [Specification](https://coursera.cs.princeton.edu/algs4/assignments/kdtree/specification.php) 
 
-Dependencies in [algs4.jar](https://algs4.cs.princeton.edu/code/algs4.jar)
+Dependencies in [algs4.jar](https://algs4.cs.princeton.edu/code/algs4.jar) 
 
+2d-Tree visulised for 250 points in a unit square : 
 
+![Alt text](2dTree-Screenshot.png?raw=true "2d-Tree visulised for 250 points in a unit square")
 
