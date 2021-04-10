@@ -7,7 +7,7 @@ Full Specification of this assignment :
 
 Dependencies in [algs4.jar](https://algs4.cs.princeton.edu/code/algs4.jar) 
 
-2d-Tree visualised for 250 points in a unit square : 
+2d-Tree visualised for 1000 points in a unit square : 
 
-![Alt text](2dTree-Screenshot.png?raw=true "2d-Tree visualised for 250 points in a unit square")
+![Alt text](2dTree-1k-SS.png?raw=true "2d-Tree visualised for 1000 points in a unit square")
 
