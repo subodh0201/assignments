@@ -5,7 +5,7 @@ import edu.princeton.cs.algs4.StdOut;
 
 public class Solver {
     
-    private Stack<Board> sol;
+    private Stack<Board> sol = null;
     private int moves = -1;
     
     private static class SearchNode implements Comparable<SearchNode> {
@@ -32,46 +32,43 @@ public class Solver {
     public Solver(Board initial) {
         if (initial == null)
             throw new IllegalArgumentException("Argument to Solver1() is null!");
-        Board t = initial.twin();
+
+        Board twin = initial.twin();
         MinPQ<SearchNode> pq = new MinPQ<>();
-        MinPQ<SearchNode> tpq = new MinPQ<>();
-        SearchNode i = new SearchNode(initial, 0, null);
-        SearchNode ti = new SearchNode(t, 0, null);
-        pq.insert(i);
-        tpq.insert(ti);
+        MinPQ<SearchNode> twinPQ = new MinPQ<>();
+        SearchNode start = new SearchNode(initial, 0, null);
+        SearchNode twinStart = new SearchNode(twin, 0, null);
+        pq.insert(start);
+        twinPQ.insert(twinStart);
         while (!pq.isEmpty()) {
             SearchNode current = pq.delMin();
+
             if (current.board.isGoal()) {
                 moves = current.moves;
-                sol = new Stack<Board>();
+                sol = new Stack<>();
                 while (current != null) {
                     sol.push(current.board);
                     current = current.prev;
                 }
                 break;
-            }
-            else {
-                Iterable<Board> n = current.board.neighbors();
-                for (Board ns : n) {
-                    if (current.prev != null && ns.equals(current.prev.board))
-                        continue;
-                    SearchNode temp = new SearchNode(ns, current.moves + 1, current);
-                    pq.insert(temp);
+            } else {
+                for (Board neighbor : current.board.neighbors()) {
+                    if (current.prev == null || !neighbor.equals(current.prev.board)) {
+                        pq.insert(new SearchNode(neighbor, current.moves + 1, current));
+                    }
                 }
             }
-            current = tpq.delMin();
+
+            current = twinPQ.delMin();
+
             if (current.board.isGoal()) {
-                moves = -1;
-                sol = null;
                 break;
             }
             else {
-                Iterable<Board> n = current.board.neighbors();
-                for (Board ns : n) {
-                    if (ns.equals(current.prev))
-                        continue;
-                    SearchNode temp = new SearchNode(ns, current.moves + 1, current);
-                    tpq.insert(temp);
+                for (Board neighbor : current.board.neighbors()) {
+                    if (current.prev == null || !neighbor.equals(current.prev.board)) {
+                        twinPQ.insert(new SearchNode(neighbor, current.moves + 1, current));
+                    }
                 }
             }
         }

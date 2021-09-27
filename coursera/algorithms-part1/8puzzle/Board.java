@@ -1,9 +1,13 @@
 import edu.princeton.cs.algs4.Stack;
 
 public class Board {
+    private static final int[] dx = {-1, 0, 1, 0};
+    private static final int[] dy = { 0, 1, 0,-1};
+
     private final int[][] tiles;
     private final int n;
-    
+
+
     public Board(int[][] tiles) {
         if (tiles == null)
             throw new IllegalArgumentException("Array cannot be null!");
@@ -15,7 +19,8 @@ public class Board {
             }
         }
     }
-    
+
+    @Override
     public String toString() {
         StringBuilder s = new StringBuilder();
         s.append(n).append("\n");
@@ -27,11 +32,11 @@ public class Board {
         }
         return s.toString();
     }
-    
+
     public int dimension() {
         return n;
     }
-    
+
     public int hamming() {
         int count = 0;
         for (int i = 0; i < n; i++) {
@@ -45,7 +50,7 @@ public class Board {
         }
         return count;
     }
-    
+
     public int manhattan() {
         int total = 0;
         for (int i = 0; i < n; i++) {
@@ -60,112 +65,97 @@ public class Board {
         }
         return total;
     }
-    
+
     public boolean isGoal() {
-        boolean goal = true;
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
                 if (i == n - 1 && j == n - 1) {
-                    if (tiles[i][j] != 0)
-                        goal = false;
-                } else {
-                    if (tiles[i][j] != (i * n + j + 1))
-                        goal = false;
+                    return (tiles[i][j] == 0);
+                } else if (tiles[i][j] != (i * n + j + 1)) {
+                    return false;
                 }
             }
         }
-        return goal;
+        return true;
     }
-    
+
     public boolean equals(Object y) {
-        if (y == null)
+        if (y == null) return false;
+        if (!y.getClass().equals(this.getClass()))
             return false;
-        if (y.getClass() != this.getClass())
-            return false;
-        if (this == y)
-            return true;
-        String ys = y.toString();
-        String ts = this.toString();
-        return ts.equals(ys);
+        if (this == y) return true;
+
+        Board that = (Board) y;
+        if (this.n != that.n) return false;
+        for (int i = 0; i < n; i++)
+            for (int j = 0; j < n; j++)
+                if (this.tiles[i][j] != that.tiles[i][j])
+                    return false;
+
+        return true;
     }
-    
+
     public Iterable<Board> neighbors() {
         Stack<Board> stack = new Stack<>();
         int x = -1, y = -1;
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
+        for (int i = 0; i < n && x == -1; i++) {
+            for (int j = 0; j < n && x == -1; j++) {
                 if (tiles[i][j] == 0) {
                     x = i;
                     y = j;
                 }
             }
         }
-        if (y > 0) {
-            int[][] ltile = copyTiles();
-            ltile[x][y] = ltile[x][y - 1];
-            ltile[x][y - 1] = 0;
-            stack.push(new Board(ltile));
+
+        for (int k = 0; k < dx.length; k++) {
+            int i = x + dx[k];
+            int j = y + dy[k];
+            if (i < 0 || i >= n || j < 0 || j >= n)
+                continue;
+            int[][] copy = copyTiles();
+            copy[x][y] = copy[i][j];
+            copy[i][j] = 0;
+            stack.push(new Board(copy));
         }
-        if (y < n - 1) {
-            int[][] rtile = copyTiles();
-            rtile[x][y] = rtile[x][y + 1];
-            rtile[x][y + 1] = 0;
-            stack.push(new Board(rtile));
-        }
-        if (x > 0) {
-            int[][] utile = copyTiles();
-            utile[x][y] = utile[x - 1][y];
-            utile[x - 1][y] = 0;
-            stack.push(new Board(utile));
-        }
-        if (x < n - 1) {
-            int[][] dtile = copyTiles();
-            dtile[x][y] = dtile[x + 1][y];
-            dtile[x + 1][y] = 0;
-            stack.push(new Board(dtile));
-        }
+
         return stack;
     }
-    
+
     public Board twin() {
-        int[][] ct = copyTiles();
-        int x = -1, y = -1;
-        int x1 = -1, y1 = -1;
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                if (tiles[i][j] == 0)
-                    continue;
-                if (x > -1 && x1 > -1)
-                    break;
-                else if (x > -1) {
-                    x1 = i;
-                    y1 = j;
-                } else {
-                    x = i;
-                    y = j;
-                }
-            }
+        int[][] copy = copyTiles();
+
+        int one = copy[0][0];
+        int two = copy[0][1];
+        int three = copy[1][0];
+
+        if (one == 0) {
+            copy[1][0] = two;
+            copy[0][1] = three;
+        } else if (two == 0) {
+            copy[0][0] = three;
+            copy[1][0] = one;
+        } else {
+            copy[0][0] = two;
+            copy[0][1] = one;
         }
-        int temp = ct[x][y];
-        ct[x][y] = ct[x1][y1];
-        ct[x1][y1] = temp;
-        return new Board(ct);
+
+        return new Board(copy);
     }
-    
+
     private int[][] copyTiles() {
-        int[][] ct = new int[n][n];
+        int[][] copy = new int[n][n];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                ct[i][j] = tiles[i][j];
+                copy[i][j] = tiles[i][j];
             }
         }
-        return ct;
+        return copy;
     }
-    
+
     public static void main(String[] args) {
         int[][] tiles = {{1, 2}, {3, 0}};
         Board b = new Board(tiles);
-        System.out.println(b.toString());
+        System.out.println(b);
         System.out.println(b.isGoal());
         System.out.println(b.hamming());
         System.out.println(b.manhattan());
@@ -174,6 +164,6 @@ public class Board {
         for (Board n : b.neighbors()) {
             System.out.println(n.toString());
         }
-        
+
     }
 }
